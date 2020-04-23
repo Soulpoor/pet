@@ -26,6 +26,10 @@ export default class UserModel {
         return await this.collection?.findOne({ _id: new ObjectID(id)}) as User;
     }
 
+    public async getUserByName(name: string) : Promise<User> {
+        return await this.collection?.findOne({ firstname: name}) as User;
+    }
+
     public async patch(user: User) : Promise<User> {
         const query = { _id: new ObjectID(user._id)};
         delete user._id;

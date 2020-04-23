@@ -1,14 +1,15 @@
 import { getModel, User } from '../models';
 
+import { Collection, ObjectID, ObjectId } from 'mongodb';
 import { JwtService } from './JwtService';
 
 export class AuthService {
 
     private static instance: AuthService;
-    private db: any;
+    private model: any;
 
     private constructor () {
-        this.db = getModel('UserModel');
+        this.model = getModel('UserModel');
     }
 
     public static getInstance(): AuthService {
@@ -16,57 +17,39 @@ export class AuthService {
         return this.instance;
     }
 
-    public async loginHandler(options: any): Promise<void> {
+    public async signInHandler(signInData: any): Promise<any> {
         try {
-            const user = await this.db.get(options.name);
-            if (options.password === user.password) {
-                //
-                const token = JwtService.getInstance().generateToken(options.name);
-                //
-                // response.write(JSON.stringify({
-                //     'token': token,
-                //     'success': true,
-                //     'result' : 'Login successful',
-                //     'name' : options.name,
-                // }));
-                // response.end();
+            const user = await this.model.getUserByName(signInData.username);
+            if (signInData.password === user.password) {
+                const token = JwtService.getInstance().generateToken(user.firstname);
+                return {
+                    ...user,
+                    token,
+                };
             } else {
-                throw new Error();
+                return false;
             }
         } catch (err) {
-            // response.writeHead(401, this.headerText);
-            // response.write(JSON.stringify({
-            //     'success': false,
-            //     'result' : 'Your account does not exist or password error, please try again!',
-            //     'name' : options.name,
-            // }));
-            // response.end();
+            return false;
         }
     }
 
-    public async logoutHandler(): Promise<void> {
+    public async signOutHandler(): Promise<void> {
 
     }
 
-    public async regHandler(options: any): Promise<void> {
+    public async signUpHandler(signUpData: any): Promise<any> {
 
-      await this.db.put(options.name, options.password);
+        const existUser = await this.model.getUserByName(signUpData.firstname);
 
-        // if (isFound) {
-        //     response.write(JSON.stringify({
-        //         'result' : 'The account has been registered',
-        //         'name' : options.name,
-        //     }));
-        //     response.end();
-        // } else {
-
-
-        //     response.write(JSON.stringify({
-        //         'result' : 'registered',
-        //         'name' : options.name,
-        //     }));
-        //     response.end();
-        // }
+        if (existUser) {
+            return false;
+        } else {
+            const newUserResult = await this.model.put(signUpData);
+            const newUser = newUserResult.ops[0];
+            newUser.token = JwtService.getInstance().generateToken(newUser.firstname);
+            return newUser; 
+        }
     }
 
 }
