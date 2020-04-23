@@ -1,4 +1,5 @@
 import express from 'express';
+
 import { loadModels } from './models';
 import {
   RootRouter,
@@ -8,7 +9,11 @@ import {
   PetServiceRouter,
 } from './routes';
 
+import { JwtService } from './services/JwtService';
+
 loadModels();
+
+JwtService.getInstance().setPrivateKey('secret/secret.key');
 
 const app = express();
 

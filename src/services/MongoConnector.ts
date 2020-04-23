@@ -9,7 +9,7 @@ export default class MongoConnector {
     private _db?: Db;
 
     private constructor (url:string, dbname?:string, user?:string, password?:string) {
-        
+
         this._url = `mongodb://${url}`;
         this._dbName = dbname || 'pet';
         this._options = {
