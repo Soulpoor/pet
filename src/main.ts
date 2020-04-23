@@ -27,7 +27,26 @@ app.use(async (req, res, next) => {
   console.info(`${req.method} ${req.originalUrl} - ${ms}ms`)
 })
 
+
 app.use('/', RootRouter);
+
+app.use(async (req, res, next) => {
+  const token = req.headers.authorization;
+  try {
+    const allow = JwtService.getInstance().verifyToken(token);
+    if (!allow) {
+      res.status(401).json({
+        msg: 'Unauthorized access!'
+      });
+    }
+    next();
+  } catch(err) {
+    res.status(401).json({
+      msg: 'Unauthorized access!'
+    });
+  }
+})
+
 app.use('/users', UserRouter);
 app.use('/pets', PetRouter);
 app.use('/articles', ArticleRouter);

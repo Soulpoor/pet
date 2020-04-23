@@ -3,7 +3,18 @@
 - POST:  localhost:8000/sing-out
 - POST:  localhost:8000/sing-up
 ```
-
+# sign-in payload:
+{
+	"username": "lucy",
+	"password": "123"
+}
+# sign-up payload:
+{
+    "firstname" : "lucy",
+    "lastname" : "John",
+    "password" : "123",
+    "email" : "lucy@outlook.com"
+}
 ```
 
 #### User
